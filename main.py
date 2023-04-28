@@ -3,6 +3,8 @@ from aiogram import Bot, types
 from aiogram.dispatcher import Dispatcher
 from aiogram.utils import executor
 from currency.currency_command import currency_command
+from aiogram.types import InputMediaPhoto
+from wallpaper.parser import image_parser
 
 
 bot = Bot(token = TOKEN)
@@ -14,12 +16,14 @@ async def process_start_command(message: types.Message):
 
 @dp.message_handler(commands=['help'])
 async def process_help_command(message: types.Message):
-    msg = 'Я могу ответить на следующие команды:\n /photo\n /arguments\n /currency  /curr'
+    msg = 'Я могу ответить на следующие команды:\n /photo\n /arguments\n /currency  /curr\n /wallpaper'
     await message.answer(msg)
-
-@dp.message_handler(commands=['photo'])
-async def process_photo_command(message: types.Message):
-    await bot.send_photo(message.from_user.id, 'https://i.ebayimg.com/images/g/LBYAAOSwCg1iikW6/s-l1600.png')
+#TODO: parsing is not a preview of the photo, but real ones and add an error handler
+@dp.message_handler(commands=['wallpaper'])
+async def process_wallpaper_command(message: types.Message):
+    images = image_parser(message.text) 
+    media = [InputMediaPhoto(image) for image in images]
+    await bot.send_media_group(message.from_user.id, media)
 
 @dp.message_handler(commands=['arguments'])
 async def test(message: types.Message):
